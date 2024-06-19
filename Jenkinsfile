@@ -8,10 +8,12 @@ pipeline {
     stages {
         stage('Setup') {
             steps {
+                // Adjust the path to the python executable if necessary
                 bat '''
                 echo "Creating virtual environment..."
-                pip install virtualenv
-                virtualenv %VENV_DIR%
+                python -m pip install --upgrade pip
+                python -m pip install virtualenv
+                python -m virtualenv %VENV_DIR%
                 call %VENV_DIR%\\Scripts\\activate
 
                 echo "Installing dependencies..."
