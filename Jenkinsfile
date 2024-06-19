@@ -1,51 +1,38 @@
 pipeline {
     agent any
-
+    
     environment {
-        VENV_DIR = 'venv'
+        ROBOT_FRAMEWORK_VERSION = '3.2.1'
+        SELENIUM2_LIBRARY_VERSION = '3.0.0'
+        SELENIUM_LIBRARY_VERSION = '4.4.0'
+        SELENIUM_VERSION = '3.141.0'
+        URLLIB3_VERSION = '1.25.9'
     }
-
+    
     stages {
-        stage('Setup') {
+        stage('Install Dependencies') {
             steps {
-                // Adjust the path to the python executable if necessary
-                bat '''
-                echo "Creating virtual environment..."
-                python -m pip install --upgrade pip
-                python -m pip install virtualenv
-                python -m virtualenv %VENV_DIR%
-                call %VENV_DIR%\\Scripts\\activate
+                script {
+                    // Install Python and pip (if necessary)
+                    sh 'pip install --upgrade pip setuptools wheel'
 
-                echo "Installing dependencies..."
-                pip install robotframework
-                pip install robotframework-selenium2library
-                pip install robotframework-seleniumlibrary
-                pip install selenium
-                '''
+                    // Install Robot Framework and Selenium libraries
+                    sh "pip install robotframework==${env.ROBOT_FRAMEWORK_VERSION}"
+                    sh "pip install robotframework-selenium2library==${env.SELENIUM2_LIBRARY_VERSION}"
+                    sh "pip install robotframework-seleniumlibrary==${env.SELENIUM_LIBRARY_VERSION}"
+                    sh "pip install selenium==${env.SELENIUM_VERSION}"
+                    sh "pip install urllib3==${env.URLLIB3_VERSION}"
+                }
             }
         }
-
+        
         stage('Run Tests') {
             steps {
-                bat '''
-                echo "Activating virtual environment..."
-                call %VENV_DIR%\\Scripts\\activate
-
-                echo "Running Robot Framework tests..."
-                robot path/to/your/tests
-                '''
+                script {
+                    // Execute Robot Framework tests
+                    sh 'robot --outputdir results test_cases'
+                }
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Archiving test results...'
-            archiveArtifacts artifacts: '**/*.xml', allowEmptyArchive: true
-            archiveArtifacts artifacts: '**/*.html', allowEmptyArchive: true
-
-            echo 'Cleaning workspace...'
-            cleanWs()
         }
     }
 }
