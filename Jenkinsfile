@@ -8,11 +8,11 @@ pipeline {
     stages {
         stage('Setup') {
             steps {
-                sh '''
+                bat '''
                 echo "Creating virtual environment..."
                 pip install virtualenv
-                virtualenv ${VENV_DIR}
-                source ${VENV_DIR}/bin/activate
+                virtualenv %VENV_DIR%
+                call %VENV_DIR%\\Scripts\\activate
 
                 echo "Installing dependencies..."
                 pip install robotframework
@@ -25,9 +25,9 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '''
+                bat '''
                 echo "Activating virtual environment..."
-                source ${VENV_DIR}/bin/activate
+                call %VENV_DIR%\\Scripts\\activate
 
                 echo "Running Robot Framework tests..."
                 robot path/to/your/tests
